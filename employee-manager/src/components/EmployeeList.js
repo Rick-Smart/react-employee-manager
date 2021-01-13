@@ -5,95 +5,188 @@ const url = "https://randomuser.me/api/?results=200&nat=us";
 class EmployeeList extends React.Component {
   state = {
     employees: [],
+    searchedEmps: [],
+    search: "",
+    sorted: false,
+    isSearching: false,
   };
 
   async componentDidMount() {
     const data = await fetch(url);
     const { results: employees } = await data.json();
     this.setState({ employees });
+    this.setState({ searchedEmps: employees });
   }
 
+  // sorting handlers for all button clicks ----------------------------------------------------------------
   sortBy = (event) => {
     const name = event.target.name;
 
+    const { employees, sorted } = this.state;
+
+    let sortedEmps;
+
     switch (name) {
-      case "firstName":
-        {
-          const allEmployees = this.state.employees
-          allEmployees.map(employee =>{
-            
-          })
+      case "first":
+        if (!sorted) {
+          sortedEmps = employees.sort(function (a, b) {
+            return a.name.first > b.name.first ? 1 : -1;
+          });
+        } else {
+          sortedEmps = employees.reverse();
         }
+        this.setState({ employees: sortedEmps, sorted: !sorted });
+
         break;
-      case "lastName":
+      case "last":
+        if (!sorted) {
+          sortedEmps = employees.sort(function (a, b) {
+            return a.name.last > b.name.last ? 1 : -1;
+          });
+        } else {
+          sortedEmps = employees.reverse();
+        }
+        this.setState({ employees: sortedEmps, sorted: !sorted });
+
         break;
       case "email":
-        break;
-      case "phone":
+        if (!sorted) {
+          sortedEmps = employees.sort(function (a, b) {
+            return a.email > b.email ? 1 : -1;
+          });
+        } else {
+          sortedEmps = employees.reverse();
+        }
+        this.setState({ employees: sortedEmps, sorted: !sorted });
+
         break;
       case "age":
+        if (!sorted) {
+          sortedEmps = employees.sort(function (a, b) {
+            return a.dob.age > b.dob.age ? 1 : -1;
+          });
+        } else {
+          sortedEmps = employees.reverse();
+        }
+        this.setState({ employees: sortedEmps, sorted: !sorted });
+
+        break;
+      case "location":
+        if (!sorted) {
+          sortedEmps = employees.sort(function (a, b) {
+            return a.location.city > b.location.city ? 1 : -1;
+          });
+        } else {
+          sortedEmps = employees.reverse();
+        }
+        this.setState({ employees: sortedEmps, sorted: !sorted });
+        break;
+      case "phone":
+        if (!sorted) {
+          sortedEmps = employees.sort(function (a, b) {
+            return a.cell > b.cell ? 1 : -1;
+          });
+        } else {
+          sortedEmps = employees.reverse();
+        }
+        this.setState({ employees: sortedEmps, sorted: !sorted });
         break;
 
       default:
-        break;
     }
+  };
+  // search function --------------------------------------------------------------------------------------------------
+  handleInputChange = (event) => {
+    this.setState(
+      {
+        search: event.target.value,
+      },
+      this.filterHandler
+    );
+  };
+  filterHandler = () => {
+    const { search, employees } = this.state;
+    const lowercasedInput = search.toLowerCase();
+    console.log(search);
+    const filteredData = employees.filter((item) => {
+      return Object.keys(item.email).some((email) =>
+        item.email.toLowerCase().includes(lowercasedInput)
+      );
+    });
+    console.log(filteredData);
+    this.setState({
+      searchedEmps: filteredData,
+    });
   };
 
   render() {
-    const { employees } = this.state;
+    const { searchedEmps } = this.state;
     return (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Profile Pic</th>
-            <td>
-              <a href="#" name="firstName" onClick={this.sortBy}>
-                First
-              </a>
-            </td>
-            <td>
-              <a href="#" name="lastName" onClick={this.sortBy}>
-                Last
-              </a>
-            </td>
-            <td>
-              <a href="#" name="email" onClick={this.sortBy}>
-                Email
-              </a>
-            </td>
-            <td>
-              <a href="#" name="phone" onClick={this.sortBy}>
-                Phone
-              </a>
-            </td>
-            <td>
-              <a href="#" name="age" onClick={this.sortBy}>
-                Age
-              </a>
-            </td>
-            <td>
-              <a href="#" name="location" onClick={this.sortBy}>
-                Location
-              </a>
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map((employee) => (
-            <tr key={employee.login.uuid}>
+      <>
+        <form className="form">
+          <input
+            name="search"
+            onChange={this.handleInputChange}
+            type="text"
+            placeholder="Search"
+          />
+          <button onClick={this.handleFormSubmit}>Submit</button>
+        </form>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Profile Pic</th>
               <td>
-                <img src={employee.picture.thumbnail} alt=""></img>
+                <button name="first" onClick={this.sortBy}>
+                  First
+                </button>
               </td>
-              <td>{employee.name.first}</td>
-              <td>{employee.name.last}</td>
-              <td>{employee.email}</td>
-              <td>{employee.cell}</td>
-              <td>{employee.dob.age}</td>
-              <td>{employee.location.city}</td>
+              <td>
+                <button name="last" onClick={this.sortBy}>
+                  Last
+                </button>
+              </td>
+              <td>
+                <button name="email" onClick={this.sortBy}>
+                  Email
+                </button>
+              </td>
+              <td>
+                <button name="phone" onClick={this.sortBy}>
+                  Phone
+                </button>
+              </td>
+              <td>
+                <button name="age" onClick={this.sortBy}>
+                  Age
+                </button>
+              </td>
+              <td>
+                <button name="location" onClick={this.sortBy}>
+                  Location
+                </button>
+              </td>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {searchedEmps.map((employee) => (
+              <tr key={employee.login.uuid}>
+                <td>
+                  <img src={employee.picture.thumbnail} alt=""></img>
+                </td>
+                <td>{employee.name.first}</td>
+                <td>{employee.name.last}</td>
+                <td>{employee.email}</td>
+                <td>{employee.cell}</td>
+                <td>{employee.dob.age}</td>
+                <td>
+                  {employee.location.city}, {employee.location.state}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
     );
   }
 }
