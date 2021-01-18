@@ -147,13 +147,13 @@ class EmployeeList extends React.Component {
                 </button>
               </td>
               <td>
-                <button name="email" onClick={this.sortBy}>
-                  Email
+                <button name="phone" onClick={this.sortBy}>
+                  Phone
                 </button>
               </td>
               <td>
-                <button name="phone" onClick={this.sortBy}>
-                  Phone
+                <button name="email" onClick={this.sortBy}>
+                  Email
                 </button>
               </td>
               <td>
@@ -176,8 +176,8 @@ class EmployeeList extends React.Component {
                 </td>
                 <td>{employee.name.first}</td>
                 <td>{employee.name.last}</td>
-                <td>{employee.email}</td>
                 <td>{employee.cell}</td>
+                <td>{employee.email}</td>
                 <td>{employee.dob.age}</td>
                 <td>
                   {employee.location.city}, {employee.location.state}
